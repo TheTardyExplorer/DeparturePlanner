@@ -14,7 +14,8 @@ import {
   verticalListSortingStrategy,
 } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
-import { Check, GripVertical, ListChecks, MapPin, Plus } from 'lucide-react'
+import { Check, GripVertical, ListChecks, MapPin, Plus, Trash2 } from 'lucide-react'
+import { toast } from 'sonner'
 import { cn } from '../lib/cn'
 import { useStore } from '../lib/store'
 import {
@@ -37,6 +38,7 @@ export function Timeline({ now, onEdit }: TimelineProps) {
   const plan = useStore((state) => state.currentPlan)
   const hourCycle = useStore((state) => state.settings.hourCycle)
   const reorderPlanItems = useStore((state) => state.reorderPlanItems)
+  const setPlan = useStore((state) => state.setPlan)
 
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 5 } }),
@@ -52,14 +54,38 @@ export function Timeline({ now, onEdit }: TimelineProps) {
     }
   }
 
+  const handleClear = () => {
+    if (plan.items.length === 0) return
+    const previous = plan
+    setPlan({ ...previous, items: [] })
+    toast('Task list cleared', {
+      action: {
+        label: 'Undo',
+        onClick: () => setPlan(previous),
+      },
+    })
+  }
+
   return (
     <section>
-      <div className="mb-2 flex items-end justify-between px-1">
+      <div className="mb-2 flex items-center justify-between gap-2 px-1">
         <h2 className="text-[15px] font-semibold">Your plan</h2>
-        <span className="text-xs text-muted-foreground">
-          {plan.items.length} {plan.items.length === 1 ? 'step' : 'steps'} ·{' '}
-          {formatDuration(total)}
-        </span>
+        <div className="flex items-center gap-1">
+          <span className="text-xs text-muted-foreground">
+            {plan.items.length} {plan.items.length === 1 ? 'step' : 'steps'} ·{' '}
+            {formatDuration(total)}
+          </span>
+          <Button
+            variant="ghost"
+            size="sm"
+            className="h-7 gap-1 px-1.5 text-xs text-muted-foreground hover:text-danger"
+            onClick={handleClear}
+            aria-label="Clear task list"
+          >
+            <Trash2 className="size-3.5" />
+            Clear
+          </Button>
+        </div>
       </div>
 
       <div className="overflow-hidden rounded-[24px] border border-border bg-card shadow-[0_1px_2px_rgba(15,23,42,0.04),0_12px_32px_-24px_rgba(15,23,42,0.35)]">

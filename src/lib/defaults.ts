@@ -12,8 +12,6 @@ export const DEFAULT_LIBRARY: TaskDef[] = [
   { id: 'lib-dressed', emoji: '👕', name: 'Get dressed', defaultMinutes: 7 },
   { id: 'lib-hair', emoji: '💇', name: 'Hair', defaultMinutes: 5 },
   { id: 'lib-shower', emoji: '🚿', name: 'Shower', defaultMinutes: 15 },
-  { id: 'lib-coffee', emoji: '☕', name: 'Make coffee', defaultMinutes: 4 },
-  { id: 'lib-dog', emoji: '🐕', name: 'Let the dog out', defaultMinutes: 5 },
   { id: 'lib-buffer', emoji: '🧘', name: 'Buffer / wiggle room', defaultMinutes: 5 },
 ]
 

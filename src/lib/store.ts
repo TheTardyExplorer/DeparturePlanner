@@ -393,14 +393,23 @@ export const useStore = create<AppState>()(
     }),
     {
       name: STORAGE_KEY,
-      version: 1,
+      version: 2,
       partialize: (state) => ({
         settings: state.settings,
         library: state.library,
         currentPlan: state.currentPlan,
         presets: state.presets,
       }),
-      migrate: (persisted) => persisted as PersistedState,
+      migrate: (persisted, version) => {
+        const state = persisted as PersistedState
+        // v2 retired two starter tasks; drop them from saved libraries but leave
+        // them alone inside plans people already built.
+        if (version < 2 && Array.isArray(state.library)) {
+          const retired = new Set(['lib-coffee', 'lib-dog'])
+          state.library = state.library.filter((task) => !retired.has(task.id))
+        }
+        return state
+      },
     },
   ),
 )

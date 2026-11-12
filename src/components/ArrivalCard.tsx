@@ -1,5 +1,5 @@
 import { Clock3, Flag } from 'lucide-react'
-import { useRef } from 'react'
+import type { MouseEvent } from 'react'
 import { useStore } from '../lib/store'
 import { formatTime, getArrivalDate, isArrivalInPast } from '../lib/time'
 import { Button } from './ui/button'
@@ -11,18 +11,23 @@ export function ArrivalCard({ now }: { now: Date }) {
   const setArrivalTime = useStore((state) => state.setArrivalTime)
   const setDayOffset = useStore((state) => state.setDayOffset)
 
-  const inputRef = useRef<HTMLInputElement>(null)
   const arrivalPassed = plan.dayOffset === 0 && isArrivalInPast(plan, now)
   const displayTime = formatTime(getArrivalDate(plan, now), hourCycle)
 
-  const openPicker = () => {
-    const input = inputRef.current
-    if (!input) return
+  /**
+   * iOS Safari opens its wheel picker from the tap itself, but it refuses to do
+   * so for an input we've made invisible and then trigger programmatically. The
+   * transparent input below is therefore the real tap target, and we only nudge
+   * desktop browsers (which need showPicker) to open their picker.
+   */
+  const handleInputClick = (event: MouseEvent<HTMLInputElement>) => {
+    const input = event.currentTarget
+    if (typeof input.showPicker !== 'function') return
+    if (window.matchMedia?.('(pointer: coarse)').matches) return
     try {
       input.showPicker()
     } catch {
-      input.focus()
-      input.click()
+      // Safari throws if the picker is already open; the native behaviour wins.
     }
   }
 
@@ -44,12 +49,10 @@ export function ArrivalCard({ now }: { now: Date }) {
         />
       </div>
 
-      <div className="relative mt-1">
-        <button
-          type="button"
-          onClick={openPicker}
-          aria-label={`Arrival time ${displayTime}. Tap to change.`}
-          className="flex w-full items-center justify-between gap-3 rounded-2xl py-0.5 text-left outline-none focus-visible:ring-2 focus-visible:ring-ring/40"
+      <div className="relative mt-1 rounded-2xl focus-within:ring-2 focus-within:ring-ring/40">
+        <div
+          aria-hidden
+          className="flex w-full items-center justify-between gap-3 py-0.5"
         >
           <span className="min-w-0 truncate text-[2.9rem] font-semibold leading-tight tracking-[-0.03em] tabular text-foreground">
             {displayTime}
@@ -57,15 +60,14 @@ export function ArrivalCard({ now }: { now: Date }) {
           <span className="grid size-11 shrink-0 place-items-center rounded-full bg-muted text-muted-foreground">
             <Clock3 className="size-5" />
           </span>
-        </button>
+        </div>
         <input
-          ref={inputRef}
           type="time"
           value={plan.arrivalTime}
           onChange={(event) => setArrivalTime(event.target.value)}
-          aria-hidden="true"
-          tabIndex={-1}
-          className="pointer-events-none absolute inset-0 size-full opacity-0"
+          onClick={handleInputClick}
+          aria-label={`Arrival time, ${displayTime}. Tap to change.`}
+          className="absolute inset-0 size-full cursor-pointer appearance-none rounded-2xl bg-transparent text-transparent opacity-0"
         />
       </div>
 
@@ -85,7 +87,7 @@ export function ArrivalCard({ now }: { now: Date }) {
         <p className="mt-2 text-[13px] text-muted-foreground">
           {plan.dayOffset === 1
             ? 'Arriving tomorrow. Preparation may start tonight.'
-            : 'Pick a time, then stack the steps that get you out the door.'}
+            : 'Tap the time to change it, then stack the steps that get you out the door.'}
         </p>
       )}
     </section>
