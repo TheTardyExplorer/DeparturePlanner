@@ -1,0 +1,230 @@
+@import 'tailwindcss';
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+:root {
+  --background: oklch(0.972 0.008 255);
+  --foreground: oklch(0.22 0.03 265);
+  --card: oklch(1 0 0);
+  --card-foreground: oklch(0.22 0.03 265);
+  --muted: oklch(0.945 0.012 255);
+  --muted-foreground: oklch(0.52 0.022 260);
+  --border: oklch(0.9 0.015 255);
+  --input: oklch(0.93 0.014 255);
+  --primary: oklch(0.54 0.2 272);
+  --primary-foreground: oklch(0.99 0.005 255);
+  --accent: oklch(0.95 0.025 255);
+  --accent-foreground: oklch(0.3 0.05 265);
+  --ring: oklch(0.6 0.17 272);
+  --danger: oklch(0.58 0.2 25);
+  --danger-foreground: oklch(0.99 0.005 255);
+  --success: oklch(0.58 0.13 165);
+  --hero-from: #312e81;
+  --hero-to: #0e7490;
+  --shadow-color: 220 40% 20%;
+}
+
+.dark {
+  --background: oklch(0.16 0.024 265);
+  --foreground: oklch(0.95 0.008 255);
+  --card: oklch(0.21 0.028 265);
+  --card-foreground: oklch(0.95 0.008 255);
+  --muted: oklch(0.26 0.03 265);
+  --muted-foreground: oklch(0.72 0.02 260);
+  --border: oklch(0.3 0.03 265);
+  --input: oklch(0.28 0.03 265);
+  --primary: oklch(0.72 0.16 275);
+  --primary-foreground: oklch(0.17 0.03 265);
+  --accent: oklch(0.28 0.04 265);
+  --accent-foreground: oklch(0.95 0.008 255);
+  --ring: oklch(0.7 0.14 275);
+  --danger: oklch(0.65 0.19 25);
+  --danger-foreground: oklch(0.16 0.02 25);
+  --success: oklch(0.72 0.13 165);
+  --hero-from: #3730a3;
+  --hero-to: #155e75;
+  --shadow-color: 260 60% 3%;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-ring: var(--ring);
+  --color-danger: var(--danger);
+  --color-danger-foreground: var(--danger-foreground);
+  --color-success: var(--success);
+  --font-sans:
+    -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Segoe UI', Roboto, Helvetica, Arial,
+    sans-serif;
+}
+
+@layer base {
+  * {
+    border-color: var(--border);
+  }
+
+  html {
+    -webkit-text-size-adjust: 100%;
+    background-color: var(--background);
+    color-scheme: light;
+  }
+
+  html.dark {
+    color-scheme: dark;
+  }
+
+  body {
+    @apply bg-background font-sans text-foreground antialiased;
+    min-height: 100dvh;
+    overscroll-behavior-y: none;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  button {
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  input,
+  button,
+  textarea,
+  select {
+    font: inherit;
+  }
+
+  input[type='time']::-webkit-calendar-picker-indicator {
+    cursor: pointer;
+    opacity: 0.45;
+  }
+
+  ::selection {
+    background: color-mix(in oklab, var(--primary) 28%, transparent);
+  }
+}
+
+@layer utilities {
+  .tabular {
+    font-variant-numeric: tabular-nums;
+    font-feature-settings: 'tnum';
+  }
+
+  .safe-bottom {
+    padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 0.75rem);
+  }
+
+  .safe-top {
+    padding-top: env(safe-area-inset-top, 0px);
+  }
+
+  .no-scrollbar {
+    scrollbar-width: none;
+  }
+
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+/* Radix dialog / sheet animations */
+@keyframes overlay-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes sheet-in {
+  from {
+    opacity: 0;
+    transform: translateY(2.5rem);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes sheet-out {
+  from {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  to {
+    opacity: 0;
+    transform: translateY(2.5rem);
+  }
+}
+
+@keyframes pop-in {
+  from {
+    opacity: 0;
+    transform: scale(0.96) translateY(0.75rem);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+@keyframes pop-in-centered {
+  from {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+  }
+}
+
+[data-slot='sheet-overlay'][data-state='open'] {
+  animation: overlay-in 200ms ease-out;
+}
+
+[data-slot='sheet-overlay'][data-state='closed'] {
+  animation: overlay-in 150ms ease-in reverse;
+}
+
+[data-slot='sheet-content'][data-state='open'] {
+  animation: sheet-in 300ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+[data-slot='sheet-content'][data-state='closed'] {
+  animation: sheet-out 200ms ease-in;
+}
+
+[data-slot='dialog-content'][data-state='open'] {
+  animation: pop-in 220ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+@media (min-width: 640px) {
+  [data-slot='sheet-content'][data-state='open'] {
+    animation: pop-in-centered 220ms cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  [data-slot='sheet-content'][data-state='closed'] {
+    animation: pop-in-centered 180ms ease-in reverse;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
